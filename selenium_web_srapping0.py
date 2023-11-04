@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
+import pandas as pd
 
 # Define the URL of the website
 URL = 'https://www.saucedemo.com/v1/'
@@ -40,23 +41,27 @@ def get_text(driver):
     products_list = []
 
     for product in products:
-        product_description = driver.find_element(By.CLASS_NAME, 'inventory_item_desc')  # Find the product description
-        product_name = driver.find_element(By.CLASS_NAME, 'inventory_item_name')  # Find the product name
-        product_price = driver.find_element(By.CLASS_NAME, 'inventory_item_price')  # Find the product price
-        product_link = driver.find_element(By.XPATH, '//*[@id="item_4_title_link"]').get_attribute('href')  # Get the product link
-
+        product_description = product.find_element(By.CLASS_NAME, 'inventory_item_desc')  # Find the product description
+        product_name = product.find_element(By.CLASS_NAME, 'inventory_item_name')  # Find the product name
+        product_price = product.find_element(By.CLASS_NAME, 'inventory_item_price')  # Find the product price
+        
+        # Create a dictionary to store product information
         product_dict = {
             "Name": product_name.text,
             "Description": product_description.text,
-            "Price": product_price.text,
-            "Link": product_link
+            "Price": product_price.text
         }
 
         products_list.append(product_dict)  # Add the product information to the list
         time.sleep(1)  # Wait for 1 second before processing the next product
 
     driver.close()  # Close the WebDriver
-    print(products_list)  # Print the list of product information
+
+    # Create a Pandas DataFrame and save it as a CSV file
+    selenium_dataframe = pd.DataFrame(products_list)
+    selenium_dataframe.to_csv('Selenium_DataFrame.csv')
+
+    print(selenium_dataframe)
     return products_list
 
 if __name__ == '__main__':
